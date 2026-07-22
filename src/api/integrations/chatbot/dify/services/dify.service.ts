@@ -121,8 +121,12 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
           },
         });
 
-        if (instance.integration === Integration.WHATSAPP_BAILEYS)
+        if (instance.integration === Integration.WHATSAPP_BAILEYS) {
           await instance.client.sendPresenceUpdate('paused', remoteJid);
+          if (!instance.localSettings?.alwaysOnline) {
+            await instance.client.sendPresenceUpdate('unavailable', remoteJid);
+          }
+        }
 
         const message = response?.data?.answer;
         const conversationId = response?.data?.conversation_id;
@@ -203,8 +207,12 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
           },
         });
 
-        if (instance.integration === Integration.WHATSAPP_BAILEYS)
+        if (instance.integration === Integration.WHATSAPP_BAILEYS) {
           await instance.client.sendPresenceUpdate('paused', remoteJid);
+          if (!instance.localSettings?.alwaysOnline) {
+            await instance.client.sendPresenceUpdate('unavailable', remoteJid);
+          }
+        }
 
         const message = response?.data?.answer;
         const conversationId = response?.data?.conversation_id;
@@ -294,8 +302,12 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
           }
         }
 
-        if (instance.integration === Integration.WHATSAPP_BAILEYS)
+        if (instance.integration === Integration.WHATSAPP_BAILEYS) {
           await instance.client.sendPresenceUpdate('paused', remoteJid);
+          if (!instance.localSettings?.alwaysOnline) {
+            await instance.client.sendPresenceUpdate('unavailable', remoteJid);
+          }
+        }
 
         if (answer) {
           await this.sendMessageWhatsApp(instance, remoteJid, answer, settings, true);

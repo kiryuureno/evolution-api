@@ -513,6 +513,10 @@ export class BaileysStartupService extends ChannelStartupService {
         profilePictureUrl: this.instance.profilePictureUrl,
         ...this.stateConnection,
       });
+
+      if (!this.localSettings?.alwaysOnline) {
+        await this.client?.sendPresenceUpdate('unavailable');
+      }
     }
 
     if (connection === 'connecting') {
@@ -2552,6 +2556,8 @@ export class BaileysStartupService extends ChannelStartupService {
           pushName: messageRaw.pushName,
           isIntegration,
         });
+      if (!this.localSettings?.alwaysOnline) {
+        await this.client?.sendPresenceUpdate('unavailable', sender);
       }
 
       return messageRaw;
@@ -2604,6 +2610,10 @@ export class BaileysStartupService extends ChannelStartupService {
         await delay(data?.delay);
 
         await this.client.sendPresenceUpdate('paused', sender);
+      }
+
+      if (!this.localSettings?.alwaysOnline && data?.presence !== 'available') {
+        await this.client?.sendPresenceUpdate('unavailable', sender);
       }
 
       return { presence: data.presence };

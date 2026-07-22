@@ -355,6 +355,9 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
 
     if (instance.integration === Integration.WHATSAPP_BAILEYS) {
       await instance.client.sendPresenceUpdate('paused', remoteJid);
+      if (!instance.localSettings?.alwaysOnline) {
+        await instance.client.sendPresenceUpdate('unavailable', remoteJid);
+      }
     }
 
     // Extract the response text safely with type checking
@@ -541,6 +544,9 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
 
       if (instance.integration === Integration.WHATSAPP_BAILEYS) {
         await instance.client.sendPresenceUpdate('paused', remoteJid);
+        if (!instance.localSettings?.alwaysOnline) {
+          await instance.client.sendPresenceUpdate('unavailable', remoteJid);
+        }
       }
 
       const responseContent = completions.choices[0].message.content;

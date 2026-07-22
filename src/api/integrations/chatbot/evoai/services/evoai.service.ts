@@ -177,8 +177,12 @@ export class EvoaiService extends BaseChatbotService<Evoai, EvoaiSetting> {
 
       this.logger.debug(`[EvoAI] Response: ${JSON.stringify(response.data)}`);
 
-      if (instance.integration === Integration.WHATSAPP_BAILEYS)
+      if (instance.integration === Integration.WHATSAPP_BAILEYS) {
         await instance.client.sendPresenceUpdate('paused', remoteJid);
+        if (!instance.localSettings?.alwaysOnline) {
+          await instance.client.sendPresenceUpdate('unavailable', remoteJid);
+        }
+      }
 
       let message = undefined;
       const result = response?.data?.result;

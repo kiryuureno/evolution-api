@@ -1480,6 +1480,10 @@ export class BaileysStartupService extends ChannelStartupService {
           this.logger.verbose(messageRaw);
 
           sendTelemetry(`received.message.${messageRaw.messageType ?? 'unknown'}`);
+          if (received.key.remoteJid?.includes('@lid') && (received.key as any).remoteJidAlt) {
+            received.key.remoteJid = (received.key as any).remoteJidAlt;
+          }
+
           if (messageRaw.key.remoteJid?.includes('@lid') && messageRaw.key.remoteJidAlt) {
             messageRaw.key.remoteJid = messageRaw.key.remoteJidAlt;
           }

@@ -1315,6 +1315,33 @@ export class ChatwootService {
         return null;
       }
 
+      if (body?.event === 'conversation_typing_on' || body?.event === 'conversation_typing_off') {
+        const chatId =
+          body.conversation?.meta?.sender?.identifier ||
+          body.conversation?.meta?.sender?.phone_number?.replace('+', '');
+
+        if (chatId) {
+          const waInstance = this.waMonitor.waInstances[instance.instanceName];
+          if (waInstance && waInstance.client) {
+            const remoteJid =
+              chatId.includes('@s.whatsapp.net') || chatId.includes('@g.us') || chatId.includes('@lid')
+                ? chatId
+                : `${chatId}@s.whatsapp.net`;
+
+            if (body.event === 'conversation_typing_on') {
+              await waInstance.client.presenceSubscribe(remoteJid);
+              await waInstance.client.sendPresenceUpdate('composing', remoteJid);
+            } else {
+              await waInstance.client.sendPresenceUpdate('paused', remoteJid);
+              if (!waInstance.localSettings?.alwaysOnline) {
+                await waInstance.client.sendPresenceUpdate('unavailable', remoteJid);
+              }
+            }
+          }
+        }
+        return { message: 'typing_event_handled' };
+      }
+
       if (
         this.provider.reopenConversation === false &&
         body.event === 'conversation_status_changed' &&
@@ -1438,6 +1465,47 @@ export class ChatwootService {
 
           await waInstance?.client?.logout('Log out instance: ' + instance.instanceName);
           await waInstance?.client?.ws?.close();
+        }
+
+        if (
+          command === 'presence' ||
+          command.startsWith('presence ') ||
+          command === 'online' ||
+          command === 'presença' ||
+          command === 'presenca'
+        ) {
+          const parts = command.split(' ');
+          const sub = parts[1]?.toLowerCase();
+
+          let newAlwaysOnline = waInstance?.localSettings?.alwaysOnline ?? false;
+
+          if (sub === 'online' || sub === 'available' || sub === 'on' || sub === 'ativar') {
+            newAlwaysOnline = true;
+          } else if (sub === 'offline' || sub === 'unavailable' || sub === 'off' || sub === 'desativar') {
+            newAlwaysOnline = false;
+          } else {
+            newAlwaysOnline = !newAlwaysOnline;
+          }
+
+          if (waInstance) {
+            await waInstance.setSettings({ ...waInstance.localSettings, alwaysOnline: newAlwaysOnline });
+
+            if (newAlwaysOnline) {
+              await waInstance.client?.sendPresenceUpdate('available');
+              await this.createBotMessage(
+                instance,
+                `🟢 Status de presença online *ATIVADO* (alwaysOnline: true).`,
+                'incoming',
+              );
+            } else {
+              await waInstance.client?.sendPresenceUpdate('unavailable');
+              await this.createBotMessage(
+                instance,
+                `🔴 Status de presença online *DESATIVADO* (alwaysOnline: false). Notificações ativas nos outros dispositivos.`,
+                'incoming',
+              );
+            }
+          }
         }
       }
 

@@ -2556,6 +2556,8 @@ export class BaileysStartupService extends ChannelStartupService {
           pushName: messageRaw.pushName,
           isIntegration,
         });
+      }
+
       if (!this.localSettings?.alwaysOnline) {
         await this.client?.sendPresenceUpdate('unavailable', sender);
       }

@@ -515,6 +515,7 @@ export class BaileysStartupService extends ChannelStartupService {
       });
 
       if (!this.localSettings?.alwaysOnline) {
+        await delay(2000);
         await this.client?.sendPresenceUpdate('unavailable');
       }
     }
@@ -652,7 +653,7 @@ export class BaileysStartupService extends ChannelStartupService {
       generateHighQualityLinkPreview: true,
       getMessage: async (key) => (await this.getMessage(key)) as Promise<proto.IMessage>,
       ...browserOptions,
-      markOnlineOnConnect: this.localSettings.alwaysOnline,
+      markOnlineOnConnect: this.localSettings?.alwaysOnline === true,
       retryRequestDelayMs: 350,
       maxMsgRetryCount: 4,
       fireInitQueries: true,
@@ -726,10 +727,10 @@ export class BaileysStartupService extends ChannelStartupService {
 
   public async connectToWhatsapp(number?: string): Promise<WASocket> {
     try {
-      this.loadChatwoot();
-      this.loadSettings();
-      this.loadWebhook();
-      this.loadProxy();
+      await this.loadChatwoot();
+      await this.loadSettings();
+      await this.loadWebhook();
+      await this.loadProxy();
 
       // Remontar o messageProcessor para garantir que está funcionando após reconexão
       this.messageProcessor.mount({

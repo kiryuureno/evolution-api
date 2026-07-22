@@ -193,6 +193,14 @@ export class ChannelStartupService {
     this.localSettings.syncFullHistory = data?.syncFullHistory;
     this.localSettings.wavoipToken = data?.wavoipToken;
 
+    if (this.client && typeof (this.client as any).sendPresenceUpdate === 'function') {
+      if (this.localSettings.alwaysOnline) {
+        await (this.client as any).sendPresenceUpdate('available');
+      } else {
+        await (this.client as any).sendPresenceUpdate('unavailable');
+      }
+    }
+
     if (this.localSettings.wavoipToken && this.localSettings.wavoipToken.length > 0) {
       this.client.ws.close();
       this.client.ws.connect();

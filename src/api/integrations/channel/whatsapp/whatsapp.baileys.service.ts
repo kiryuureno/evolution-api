@@ -1341,25 +1341,36 @@ export class BaileysStartupService extends ChannelStartupService {
           }
 
           if (this.localChatwoot?.enabled === undefined) {
+            this.logger.warn(`[CHATWOOT-DEBUG] localChatwoot.enabled is undefined, calling loadChatwoot()`);
             await this.loadChatwoot();
+            this.logger.warn(`[CHATWOOT-DEBUG] After loadChatwoot(): localChatwoot.enabled = ${this.localChatwoot?.enabled}`);
           }
 
+          const chatwootGlobalEnabled = this.configService.get<Chatwoot>('CHATWOOT').ENABLED;
+          const chatwootLocalEnabled = this.localChatwoot?.enabled;
+          const isBroadcast = received.key.id.includes('@broadcast');
+          this.logger.warn(`[CHATWOOT-DEBUG] Decision point: globalEnabled=${chatwootGlobalEnabled}, localEnabled=${chatwootLocalEnabled}, isBroadcast=${isBroadcast}, remoteJid=${received.key.remoteJid}, fromMe=${received.key.fromMe}`);
+
           if (
-            this.configService.get<Chatwoot>('CHATWOOT').ENABLED &&
-            this.localChatwoot?.enabled &&
-            !received.key.id.includes('@broadcast')
+            chatwootGlobalEnabled &&
+            chatwootLocalEnabled &&
+            !isBroadcast
           ) {
+            this.logger.warn(`[CHATWOOT-DEBUG] Entering eventWhatsapp for messages.upsert`);
             const chatwootSentMessage = await this.chatwootService.eventWhatsapp(
               Events.MESSAGES_UPSERT,
               { instanceName: this.instance.name, instanceId: this.instanceId },
               messageRaw,
             );
+            this.logger.warn(`[CHATWOOT-DEBUG] eventWhatsapp returned: ${JSON.stringify(chatwootSentMessage?.id)}`);
 
             if (chatwootSentMessage?.id) {
               messageRaw.chatwootMessageId = chatwootSentMessage.id;
               messageRaw.chatwootInboxId = chatwootSentMessage.inbox_id;
               messageRaw.chatwootConversationId = chatwootSentMessage.conversation_id;
             }
+          } else {
+            this.logger.warn(`[CHATWOOT-DEBUG] SKIPPED Chatwoot integration! Reason: globalEnabled=${chatwootGlobalEnabled}, localEnabled=${chatwootLocalEnabled}, isBroadcast=${isBroadcast}`);
           }
 
           if (this.configService.get<Openai>('OPENAI').ENABLED && received?.message?.audioMessage) {

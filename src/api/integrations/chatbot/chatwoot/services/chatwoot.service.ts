@@ -823,35 +823,33 @@ export class ChatwootService {
         }
 
         let inboxConversation = contactConversations.payload.find(
-          (conversation) => conversation.inbox_id == filterInbox.id,
+          (conversation) => conversation.inbox_id == filterInbox.id && conversation.status !== 'resolved',
         );
+
+        if (!inboxConversation) {
+          inboxConversation = contactConversations.payload.find(
+            (conversation) => conversation.inbox_id == filterInbox.id,
+          );
+        }
+
         if (inboxConversation) {
-          if (this.provider.reopenConversation) {
-            this.logger.verbose(
-              `Found conversation in reopenConversation mode: ID: ${inboxConversation.id} - Name: ${inboxConversation.meta.sender.name} - Identifier: ${inboxConversation.meta.sender.identifier}`,
-            );
-            if (inboxConversation && this.provider.conversationPending && inboxConversation.status !== 'open') {
+          if (inboxConversation.status === 'resolved' || this.provider.reopenConversation) {
+            try {
               await client.conversations.toggleStatus({
                 accountId: this.provider.accountId,
                 conversationId: inboxConversation.id,
                 data: {
-                  status: 'pending',
+                  status: this.provider.conversationPending ? 'pending' : 'open',
                 },
               });
+            } catch (error) {
+              this.logger.error(`Error toggling conversation status: ${error}`);
             }
-          } else {
-            inboxConversation = contactConversations.payload.find(
-              (conversation) =>
-                conversation && conversation.status !== 'resolved' && conversation.inbox_id == filterInbox.id,
-            );
-            this.logger.verbose(`Found conversation: ${JSON.stringify(inboxConversation)}`);
           }
 
-          if (inboxConversation) {
-            this.logger.verbose(`Returning existing conversation ID: ${inboxConversation.id}`);
-            this.cache.set(cacheKey, inboxConversation.id, 1800);
-            return inboxConversation.id;
-          }
+          this.logger.verbose(`Returning existing conversation ID: ${inboxConversation.id}`);
+          this.cache.set(cacheKey, inboxConversation.id, 1800);
+          return inboxConversation.id;
         }
 
         const data = {

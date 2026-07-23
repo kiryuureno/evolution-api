@@ -1332,6 +1332,14 @@ export class BaileysStartupService extends ChannelStartupService {
             await this.client.readMessages([received.key]);
           }
 
+          if (received.key.remoteJid?.includes('@lid') && (received.key as any).remoteJidAlt) {
+            received.key.remoteJid = (received.key as any).remoteJidAlt;
+          }
+
+          if (messageRaw.key.remoteJid?.includes('@lid') && messageRaw.key.remoteJidAlt) {
+            messageRaw.key.remoteJid = messageRaw.key.remoteJidAlt;
+          }
+
           if (
             this.configService.get<Chatwoot>('CHATWOOT').ENABLED &&
             this.localChatwoot?.enabled &&

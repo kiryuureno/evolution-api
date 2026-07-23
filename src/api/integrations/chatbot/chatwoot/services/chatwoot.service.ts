@@ -1334,7 +1334,7 @@ export class ChatwootService {
             } else {
               await waInstance.client.sendPresenceUpdate('paused', remoteJid);
               if (!waInstance.localSettings?.alwaysOnline) {
-                await waInstance.client.sendPresenceUpdate('unavailable', remoteJid);
+                await waInstance.client.sendPresenceUpdate('unavailable');
               }
             }
           }

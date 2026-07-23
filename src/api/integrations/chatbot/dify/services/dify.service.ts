@@ -124,7 +124,7 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
         if (instance.integration === Integration.WHATSAPP_BAILEYS) {
           await instance.client.sendPresenceUpdate('paused', remoteJid);
           if (!instance.localSettings?.alwaysOnline) {
-            await instance.client.sendPresenceUpdate('unavailable', remoteJid);
+            await instance.client.sendPresenceUpdate('unavailable');
           }
         }
 
@@ -210,7 +210,7 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
         if (instance.integration === Integration.WHATSAPP_BAILEYS) {
           await instance.client.sendPresenceUpdate('paused', remoteJid);
           if (!instance.localSettings?.alwaysOnline) {
-            await instance.client.sendPresenceUpdate('unavailable', remoteJid);
+            await instance.client.sendPresenceUpdate('unavailable');
           }
         }
 
@@ -305,7 +305,7 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
         if (instance.integration === Integration.WHATSAPP_BAILEYS) {
           await instance.client.sendPresenceUpdate('paused', remoteJid);
           if (!instance.localSettings?.alwaysOnline) {
-            await instance.client.sendPresenceUpdate('unavailable', remoteJid);
+            await instance.client.sendPresenceUpdate('unavailable');
           }
         }
 

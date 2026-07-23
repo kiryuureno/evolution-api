@@ -356,7 +356,7 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
     if (instance.integration === Integration.WHATSAPP_BAILEYS) {
       await instance.client.sendPresenceUpdate('paused', remoteJid);
       if (!instance.localSettings?.alwaysOnline) {
-        await instance.client.sendPresenceUpdate('unavailable', remoteJid);
+        await instance.client.sendPresenceUpdate('unavailable');
       }
     }
 
@@ -545,7 +545,7 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
       if (instance.integration === Integration.WHATSAPP_BAILEYS) {
         await instance.client.sendPresenceUpdate('paused', remoteJid);
         if (!instance.localSettings?.alwaysOnline) {
-          await instance.client.sendPresenceUpdate('unavailable', remoteJid);
+          await instance.client.sendPresenceUpdate('unavailable');
         }
       }
 

@@ -2584,7 +2584,7 @@ export class BaileysStartupService extends ChannelStartupService {
       }
 
       if (!this.localSettings?.alwaysOnline) {
-        await this.client?.sendPresenceUpdate('unavailable', sender);
+        await this.client?.sendPresenceUpdate('unavailable');
       }
 
       return messageRaw;
@@ -2640,7 +2640,7 @@ export class BaileysStartupService extends ChannelStartupService {
       }
 
       if (!this.localSettings?.alwaysOnline && data?.presence !== 'available') {
-        await this.client?.sendPresenceUpdate('unavailable', sender);
+        await this.client?.sendPresenceUpdate('unavailable');
       }
 
       return { presence: data.presence };

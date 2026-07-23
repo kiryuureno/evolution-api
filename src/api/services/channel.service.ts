@@ -235,26 +235,39 @@ export class ChannelStartupService {
       return;
     }
 
-    const data = await this.prismaRepository.chatwoot.findUnique({
-      where: {
-        instanceId: this.instanceId,
-      },
-    });
+    let data = null;
+    if (this.instanceId) {
+      data = await this.prismaRepository.chatwoot.findUnique({
+        where: {
+          instanceId: this.instanceId,
+        },
+      });
+    }
 
-    this.localChatwoot.enabled = data?.enabled;
-    this.localChatwoot.accountId = data?.accountId;
-    this.localChatwoot.token = data?.token;
-    this.localChatwoot.url = data?.url;
-    this.localChatwoot.nameInbox = data?.nameInbox;
-    this.localChatwoot.signMsg = data?.signMsg;
-    this.localChatwoot.signDelimiter = data?.signDelimiter;
-    this.localChatwoot.number = data?.number;
-    this.localChatwoot.reopenConversation = data?.reopenConversation;
-    this.localChatwoot.conversationPending = data?.conversationPending;
-    this.localChatwoot.mergeBrazilContacts = data?.mergeBrazilContacts;
-    this.localChatwoot.importContacts = data?.importContacts;
-    this.localChatwoot.importMessages = data?.importMessages;
-    this.localChatwoot.daysLimitImportMessages = data?.daysLimitImportMessages;
+    if (!data && this.instanceName) {
+      const instanceData = await this.prismaRepository.instance.findUnique({
+        where: { name: this.instanceName },
+        include: { Chatwoot: true },
+      });
+      data = instanceData?.Chatwoot;
+    }
+
+    if (data) {
+      this.localChatwoot.enabled = data.enabled;
+      this.localChatwoot.accountId = data.accountId;
+      this.localChatwoot.token = data.token;
+      this.localChatwoot.url = data.url;
+      this.localChatwoot.nameInbox = data.nameInbox;
+      this.localChatwoot.signMsg = data.signMsg;
+      this.localChatwoot.signDelimiter = data.signDelimiter;
+      this.localChatwoot.number = data.number;
+      this.localChatwoot.reopenConversation = data.reopenConversation;
+      this.localChatwoot.conversationPending = data.conversationPending;
+      this.localChatwoot.mergeBrazilContacts = data.mergeBrazilContacts;
+      this.localChatwoot.importContacts = data.importContacts;
+      this.localChatwoot.importMessages = data.importMessages;
+      this.localChatwoot.daysLimitImportMessages = data.daysLimitImportMessages;
+    }
   }
 
   public async setChatwoot(data: ChatwootDto) {

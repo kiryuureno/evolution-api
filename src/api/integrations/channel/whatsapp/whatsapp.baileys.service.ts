@@ -1340,6 +1340,10 @@ export class BaileysStartupService extends ChannelStartupService {
             messageRaw.key.remoteJid = messageRaw.key.remoteJidAlt;
           }
 
+          if (this.localChatwoot?.enabled === undefined) {
+            await this.loadChatwoot();
+          }
+
           if (
             this.configService.get<Chatwoot>('CHATWOOT').ENABLED &&
             this.localChatwoot?.enabled &&
@@ -1543,6 +1547,10 @@ export class BaileysStartupService extends ChannelStartupService {
 
           if (contact) {
             this.sendDataWebhook(Events.CONTACTS_UPDATE, contactRaw);
+
+            if (this.localChatwoot?.enabled === undefined) {
+              await this.loadChatwoot();
+            }
 
             if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED && this.localChatwoot?.enabled) {
               await this.chatwootService.eventWhatsapp(

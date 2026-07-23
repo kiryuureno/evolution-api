@@ -876,9 +876,13 @@ export class BaileysStartupService extends ChannelStartupService {
               if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED && this.localChatwoot?.enabled) {
                 const instance = { instanceName: this.instance.name, instanceId: this.instance.id };
 
+                const jidToSearch = contact.remoteJid.includes('@lid') && (contact as any).remoteJidAlt
+                  ? (contact as any).remoteJidAlt.split('@')[0]
+                  : contact.remoteJid.split('@')[0];
+
                 const findParticipant = await this.chatwootService.findContact(
                   instance,
-                  contact.remoteJid.split('@')[0],
+                  jidToSearch,
                 );
 
                 if (!findParticipant) {
